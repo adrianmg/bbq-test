@@ -1,0 +1,63 @@
+name: stage-prod-deploy
+
+on: [workflow_dispatch]
+      
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo Built Container
+
+  test-a:
+    needs: build
+    name: test A
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo Built Container
+      
+  test-b:
+    needs: build
+    name: test B
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo Built Container
+      
+  test-c:
+    needs: build
+    name: test C
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo Built Container
+ 
+  e2e-test:
+    needs: [test-a,test-b,test-c]
+    name: e2e test
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo Built Container
+
+  deploy_to_staging:
+    name: Deploy Staging
+    runs-on: ubuntu-latest
+    environment: 
+      name: staging
+      url: https://popular-repos-staging.azurewebsites.net
+    needs: e2e-test
+    steps:
+    - run: echo Setup environment; sleep 4
+    - run: echo Create slot; sleep 4
+    - run: echo Deploy application; sleep 4
+    
+  deploy_to_production:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    environment: 
+      name: prod
+      url: https://popular-repos.azurewebsites.net
+    needs: deploy_to_staging
+    steps:
+    - run: echo Setup environment; sleep 4
+    - run: echo prepare deployment; sleep 4
+    - run: echo Create slot; sleep 4
+    - run: echo Deploy application; sleep 4
